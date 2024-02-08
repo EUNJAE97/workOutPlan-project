@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.management.product.model.dao.WorkOutPlanDAO">
+    <resultMap id="workOutResulMap" type="WorkOutLogDTO">
+        <id property="logCode" column="log_code"/>
+        <result property="workoutDate" column="workout_date"/>
+        <result property="workoutSet" column="workout_set"/>
+        <result property="workoutCount" column="workout_count"/>
+        <result property="maxWeight" column="max_weight"/>
+        <result property="categoryCode" column="category_code"/>
+        <result property="workoutStatus" column="workout_status"/>
+        <result property="userCode" column="user_code"/>
+        <association property="category" javaType="com.management.product.model.dto.CategoryDTO">
+            <id property="categoryCode" column="category_code"/>
+            <result property="categoryName" column="category_name"/>
+            <result property="categoryPart" column="category_part"/>
+        </association>
+    </resultMap>
+    <select id="selectAllWorkOutList" resultMap="workOutResulMap">
+        SELECT a.log_code,
+               a.workout_status,
+               a.workout_date,
+               a.workout_set,
+               a.workout_count,
+               a.max_weight,
+               b.category_name,
+               b.category_part,
+               a.user_code,
+               a.category_code
+        FROM work_out_log a
+                 LEFT JOIN work_out_category b on (a.category_code = b.category_code)
+        ORDER BY a.log_code
+
+
+    </select>
+    <select id="selectConditionWorkOutList" parameterType="com.common.SearchCondition" resultMap="workOutResulMap">
+        SELECT a.log_code,
+        a.workout_status,
+        a.workout_date,
+        a.workout_set,
+        a.workout_count,
+        a.max_weight,
+        b.category_name,
+        b.category_part,
+        a.user_code,
+        a.category_code
+        FROM work_out_log a
+        LEFT JOIN work_out_category b on (a.category_code = b.category_code)
+        <where>
+            <choose>
+                <when test="option != null and option eq 'workoutDate'">
+                    workout_date like concat('%', #{value} , '%')
+                </when>
+                <when test="option != null and option eq 'categoryPart'">
+                    category_part like concat('%', #{value} , '%')
+                </when>
+                <when test="option != null and option eq 'workoutStatus'">
+                    workout_status like concat('%', #{value} , '%')
+                </when>
+
+            </choose>
+        </where>
+        ORDER BY a.log_code
+
+    </select>
+
+    <resultMap id="userResultMap" type="com.management.product.model.dto.UserDTO">
+        <id property="userCode" column="user_code"/>
+        <result property="userWeight" column="user_weight"/>
+        <result property="userHeight" column="user_height"/>
+        <result property="userBodyFat" column="user_body_fat"/>
+        <result property="userMuscle" column="user_muscle"/>
+
+    </resultMap>
+    <select id="selectUserInfo" resultMap="userResultMap">
+        SELECT user_code,
+               user_weight,
+               user_height,
+               user_body_fat,
+               user_muscle
+        FROM user_info
+        ORDER BY user_code
+    </select>
+
+    <insert id="insertWorkOutLog" parameterType="WorkOutLogDTO">
+        INSERT INTO work_out_log (workout_status, workout_date, workout_set, workout_count, max_weight, category_code,
+                                  user_code)
+        VALUES (#{workoutStatus}, #{workoutDate}, #{workoutSet}, #{workoutCount}, #{maxWeight}, #{categoryCode},
+                #{userCode})
+    </insert>
+
+    <update id="updateWorkOutLog" parameterType="WorkOutLogDTO">
+        UPDATE work_out_log
+        <set>
+            <if test="workoutStatus != null and workoutStatus neq 'SKIP'">
+                workout_status = #{workoutStatus},
+            </if>
+            <if test="workoutDate != null and workoutDate neq 'SKIP'">
+                workout_date = #{workoutDate},
+            </if>
+            <if test="workoutSet != null and workoutSet neq 'SKIP'">
+                workout_set = #{workoutSet},
+            </if>
+            <if test="workoutCount != null and workoutCount neq 'SKIP'">
+                workout_count = #{workoutCount},
+            </if>
+            <if test="maxWeight != null and maxWeight neq 'SKIP'">
+                max_weight = #{maxWeight},
+            </if>
+            <if test="categoryCode != null">
+                <choose>
+                    <when test="categoryCode != 0">
+                        category_code = #{categoryCode},
+                    </when>
+                </choose>
+            </if>
+
+            <if test="userCode != null">
+                <choose>
+                    <when test="userCode != 0">
+                        user_code = #{userCode}
+                    </when>
+                </choose>
+            </if>
+        </set>
+        WHERE log_code = #{logCode}
+    </update>
+    <delete id="deleteWorkOutLog" parameterType="WorkOutLogDTO">
+        DELETE
+        FROM work_out_log
+        WHERE log_code = #{logCode}
+
+    </delete>
+</mapper>

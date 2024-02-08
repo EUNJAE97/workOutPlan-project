@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+    <properties resource="config/connection-info.properties"/>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <typeAliases>
+        <typeAlias type="com.management.product.model.dto.WorkOutLogDTO" alias="WorkOutLogDTO"/>
+    </typeAliases>
+    <environments default="dev">
+        <environment id="dev">
+            <!-- type : JDBC or MANAGED 선택 -->
+            <transactionManager type="JDBC"/>
+            <!-- type : POOLED or UNPOOLED 선택 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- 주석을 지우고 mybatis 설정 파일 내용을 작성하세요. -->
+<mappers>
+   <mapper resource="com/management/product/model/dao/WorkOutPlanDAO.xml"/>
+
+</mappers>
+</configuration>
